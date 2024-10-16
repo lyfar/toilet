@@ -42,7 +42,7 @@ body {
 }
 
 .credits {
-	font-size: 3rem;
+	font-size: clamp(1rem,5vw,3rem);
 	text-transform: uppercase;
 	text-align: center;
 	margin: 50vh auto 0;
@@ -121,6 +121,8 @@ a:not(.card__image):focus-visible {
 
 main {
 	position: relative;
+	overflow: hidden;
+	width: 100vw;
 }
 
 .unbutton {
@@ -143,8 +145,8 @@ main {
 	padding: 1.5rem;
 	display: grid;
 	width: 100%;
-	grid-template-columns: auto auto auto;
-	grid-template-areas: 'back archive github' 'sponsor' ;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-areas: 'back archive github' 'sponsor sponsor sponsor' ;
 	grid-gap: 1.5rem;
 	z-index: 6000;
 }
@@ -207,23 +209,12 @@ main {
     margin-bottom: 4rem;
     padding-bottom: 1rem;
     line-height: 1.2;
+    opacity: 0.4;
     position: relative;
     align-self: end;
     text-transform: uppercase;
 	font-size: 13px;
 	align-self: end;
-	animation: fadeOut 1s linear both;
-	animation-timeline: view();
-	animation-range: 30% 100%;
-}
-
-@keyframes fadeOut {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-  }
 }
 
 .intro__info::after {
