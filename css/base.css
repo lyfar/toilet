@@ -166,7 +166,7 @@ main {
 	grid-area: archive;
 }
 
-.frame__gitbub {
+.frame__github {
 	grid-area: github;
 }
 
