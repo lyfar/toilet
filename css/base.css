@@ -19,7 +19,7 @@
   --grid-gap: 2rem;
   --grid-columns: 2;
   --grid-columns-full: 7;
-  --grid-rows-full: 5;
+  --grid-rows-full: 14;
   --grid-item-translate: 0px;
   --grid-item-height: auto;
 }
@@ -288,17 +288,17 @@ section {
 }
 
 .grid--full {
-  width: 100%;
-  margin: 10vh 0;
+  width: 90%;
+  margin: 10vh auto;
   height: auto;
-  aspect-ratio: 1.5;
-  max-width: none;
-  --grid-gap: 1rem;
+  max-width: 1400px;
+  --grid-gap: 0.5rem;
   --grid-item-height: 100%;
-  --grid-item-ratio: auto;
+  --grid-item-ratio: 1;
   padding: var(--grid-gap);
   grid-template-columns: repeat(var(--grid-columns-full),1fr);
   grid-template-rows: repeat(var(--grid-rows-full),1fr);
+  min-height: calc(80px * var(--grid-rows-full));
 }
 
 .grid__item {
@@ -307,28 +307,33 @@ section {
   z-index: 1;
   perspective: 800px;
   will-change: transform, opacity;
+  aspect-ratio: 1;
+  max-width: 150px;
+  justify-self: center;
+  width: 100%;
 }
 
 .grid__item > .grid__item-img,
 .grid__item-imgwrap {
   width: 100%;
-  aspect-ratio: var(--grid-item-ratio);
-  height: var(--grid-item-height);
+  height: 100%;
   border-radius: var(--grid-item-radius);
   transform-style: preserve-3d;
+}
+
+.grid__item-img {
+  background-size: cover;
+  background-position: 50% 50%;
+  backface-visibility: hidden;
+  will-change: transform;
+  height: 100%;
+  width: 100%;
 }
 
 .grid__item-imgwrap {
   position: relative;
   overflow: hidden;
   will-change: filter;
-}
-
-.grid__item-img {
-  background-size: cover;
-  background-position: 50% 20%;
-  backface-visibility: hidden;
-  will-change: transform;
 }
 
 .grid__item-imgwrap > .grid__item-img {

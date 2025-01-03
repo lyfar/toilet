@@ -1,7 +1,6 @@
 import { preloadImages } from './utils.js'; // Import utility function to preload images
 
 gsap.registerPlugin(ScrollTrigger); // Register GSAP's ScrollTrigger plugin
-gsap.registerPlugin(SplitText);     // Register GSAP's SplitText plugin
 
 const grid = document.querySelector('.grid'); // Select the container that holds all grid items
 const gridImages = grid.querySelectorAll('.grid__item-imgwrap'); // Select all elements with the class '.grid__item-imgwrap'
@@ -9,11 +8,28 @@ const gridImages = grid.querySelectorAll('.grid__item-imgwrap'); // Select all e
 const marqueeInner = document.querySelector('.mark > .mark__inner'); // Select the inner element of the marquee
 
 const textElement = document.querySelector('.text'); // Select the text element
-var splitTextEl = new SplitText(textElement, {type: 'chars'}); // Split the text into individual characters for animation
+var splitTextEl = splitTextIntoChars(textElement); // Initialize splitTextEl with our custom function
 
 const gridFull = document.querySelector('.grid--full'); // Select the full grid container
 
 const creditsTexts = document.querySelectorAll('.credits'); // Select all elements with the class '.credits'
+
+// Custom text splitting function
+function splitTextIntoChars(element) {
+    const text = element.textContent.trim();
+    element.textContent = '';
+    const chars = [];
+    
+    for (let char of text) {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block'; // Makes each character animatable
+        element.appendChild(span);
+        chars.push(span);
+    }
+    
+    return { chars };
+}
 
 // Helper function to determine if the element is on the left or right side of the viewport
 const isLeftSide = (element) => {
@@ -128,49 +144,46 @@ const animateGridFull = () => {
 
   // Animate each column, starting from the center column, with staggered delays for adjacent columns
   columns.forEach((columnItems, columnIndex) => {
-    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.2; // Delay based on distance from the center column
+    const delayFactor = Math.abs(columnIndex - middleColumnIndex) * 0.1; // Reduced delay for smoother animation
 
     // GSAP timeline for the entire column
     gsap.timeline({
       scrollTrigger: {
-        trigger: gridFull,               // Trigger the animation when the full grid section comes into view
-        start: 'top bottom',             // Start when the top of the grid hits the bottom of the viewport
-        end: 'center center',            // End when the bottom of the grid hits the center of the viewport
-        scrub: true,                     // Smooth scrub
+        trigger: gridFull,
+        start: 'top bottom',
+        end: 'bottom center',  // Changed to ensure full grid is visible
+        scrub: true,
       }
     })
     .from(columnItems, {
-      // Animate the column items into view
-      yPercent: 450,                     // Start with items far below the viewport
-      autoAlpha: 0,                      // Fade in from opacity 0
-      delay: delayFactor,                // Delay based on distance from the center
+      yPercent: 200,          // Reduced distance for smoother animation
+      autoAlpha: 0,
+      delay: delayFactor,
       ease: 'sine',
     })
     .from(columnItems.map(item => item.querySelector('.grid__item-img')), {
-      // Apply rotation to the images inside each grid item
-      transformOrigin: '50% 0%',          // Set the transform origin for the 3D effect
+      transformOrigin: '50% 0%',
       ease: 'sine',
-    }, 0); // Start the rotation at the same time as the translation
+    }, 0);
   });
 };
 
 const animateCredits = () => {
   creditsTexts.forEach(creditsText => {
-    const splitCredits = new SplitText(creditsText, { type: 'chars' }); // Split each credits text into characters
+    const splitCredits = splitTextIntoChars(creditsText); // Use our custom function instead of SplitText
 
-    // GSAP timeline for the credits animation
     gsap.timeline({
       scrollTrigger: {
-        trigger: creditsText,              // Trigger the animation for each credits element
-        start: 'top bottom',               // Start when the top of the element hits the bottom of the viewport
-        end: 'clamp(bottom top)',          // End when the bottom of the element hits the top of the viewport
-        scrub: true,                       // Smooth scrub as you scroll
+        trigger: creditsText,
+        start: 'top bottom',
+        end: 'clamp(bottom top)',
+        scrub: true,
       }
     })
     .fromTo(splitCredits.chars, {
-      x: (index) => index * 80 - ((splitCredits.chars.length * 80) / 2),  // Start with extra spacing between characters, centered
+      x: (index) => index * 80 - ((splitCredits.chars.length * 80) / 2),
     }, {
-      x: 0,                               // Animate the characters back to their original position
+      x: 0,
       ease: 'sine'
     });
   });
