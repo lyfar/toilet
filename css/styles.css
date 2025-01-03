@@ -1,0 +1,15 @@
+.bg-image {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+}
+
+/* Add media query for desktop screens */
+@media screen and (min-width: 1024px) {
+    .bg-image {
+        max-height: 90vh; /* Reduce height on desktop */
+        width: auto;
+        margin: 0 auto;
+        display: block;
+    }
+} 

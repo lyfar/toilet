@@ -14,16 +14,91 @@ const gridFull = document.querySelector('.grid--full'); // Select the full grid 
 
 const creditsTexts = document.querySelectorAll('.credits'); // Select all elements with the class '.credits'
 
+const description = document.querySelector('.description');
+const observer = null;
+
+// Ensure the description is visible if it's already in viewport on load
+document.addEventListener('DOMContentLoaded', () => {
+    const description = document.querySelector('.description');
+    if (description) {
+        if (isElementInViewport(description)) {
+            description.classList.add('is-visible');
+        } else {
+            observer.observe(description);
+        }
+    }
+});
+
+// Helper function to check if element is in viewport
+function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
 // Custom text splitting function
 function splitTextIntoChars(element) {
+    // Special handling for elements containing links
+    const links = element.getElementsByTagName('a');
+    if (links.length > 0) {
+        const text = element.textContent.trim();
+        element.textContent = '';
+        const chars = [];
+        
+        // Split text into three parts: before link, link text, and after link
+        const linkText = links[0].textContent;
+        const linkHref = links[0].href;
+        const fullText = text;
+        const linkIndex = fullText.indexOf(linkText);
+        
+        const beforeLink = fullText.substring(0, linkIndex);
+        const afterLink = fullText.substring(linkIndex + linkText.length);
+        
+        // Add characters before the link
+        for (let char of beforeLink) {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.display = 'inline-block';
+            if (char === ' ') span.style.marginRight = '0.25em';
+            element.appendChild(span);
+            chars.push(span);
+        }
+        
+        // Add the link as a special element
+        const link = document.createElement('a');
+        link.href = linkHref;
+        link.textContent = linkText;
+        link.style.display = 'inline-block';
+        element.appendChild(link);
+        chars.push(link);
+        
+        // Add characters after the link
+        for (let char of afterLink) {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.display = 'inline-block';
+            if (char === ' ') span.style.marginRight = '0.25em';
+            element.appendChild(span);
+            chars.push(span);
+        }
+        
+        return { chars };
+    }
+    
+    // Original behavior for elements without links
     const text = element.textContent.trim();
     element.textContent = '';
     const chars = [];
     
     for (let char of text) {
         const span = document.createElement('span');
-        span.textContent = char;
-        span.style.display = 'inline-block'; // Makes each character animatable
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        span.style.display = 'inline-block';
+        if (char === ' ') span.style.marginRight = '0.25em';
         element.appendChild(span);
         chars.push(span);
     }
@@ -169,24 +244,26 @@ const animateGridFull = () => {
 };
 
 const animateCredits = () => {
-  creditsTexts.forEach(creditsText => {
-    const splitCredits = splitTextIntoChars(creditsText); // Use our custom function instead of SplitText
-
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: creditsText,
-        start: 'top bottom',
-        end: 'clamp(bottom top)',
-        scrub: true,
-      }
-    })
-    .fromTo(splitCredits.chars, {
-      x: (index) => index * 80 - ((splitCredits.chars.length * 80) / 2),
-    }, {
-      x: 0,
-      ease: 'sine'
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: '.description',
+            start: 'top bottom',
+            end: 'bottom top',
+            toggleActions: 'play none none reverse'
+        }
     });
-  });
+
+    // Animate both texts together without splitting
+    timeline.fromTo('.description .credits', {
+        opacity: 0,
+        y: 30
+    }, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        stagger: 0.2,
+        ease: 'power2.out'
+    });
 };
 
 
